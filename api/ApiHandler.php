@@ -70,7 +70,9 @@ class ApiHandler {
             // Check if the database is empty or has fewer records than the API data
             if (empty($existingData) || count($existingData) < count($apiData)) {
                 // If empty or fewer records, insert all API data or update it
-                $this->dbUtils->insertOrUpdateExchangeRates($conn, $apiData, $currency);
+                // $this->dbUtils->insertOrUpdateExchangeRates($conn, $apiData, $currency);
+                $this->dbUtils->insertExchangeRates($conn, $apiData, $currency);
+                $this->dbUtils->removeDuplicateRecords($conn,$currency);
             }
         } catch (Exception $e) {
             // Handle exceptions (log or display an error message)
