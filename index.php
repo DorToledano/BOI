@@ -3,14 +3,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require 'config.php';
-require_once 'database.php';
 include_once 'services/utils_service.php';
 require_once 'models/ExchangeRate.php';
-require_once 'api/ApiHandler.php';
-require_once 'services/DatabaseUtils.php';
-
-include_once __DIR__ . './services/DatabaseUtils.php';
-include_once __DIR__ . './api/ApiHandler.php';
+include_once __DIR__ . '/services/DatabaseUtils.php';
+include_once __DIR__ . '/api/ApiHandler.php';
 
 // Connection to db
 $conn = DatabaseUtils::connectToDatabase();
@@ -28,6 +24,8 @@ foreach ($currencies as $currency) {
     // Fetch data from the external API and update the database
     $apiHandler->fetchDataAndUpdateDatabase($currency);
 }
+
+
 
 ?>
 
@@ -54,6 +52,8 @@ foreach ($currencies as $currency) {
             echo "<li>{$result['currency']} | {$result['exchange_rate']} | {$result['Date_stamp']}</li>";
         }
         echo "</ol>";
+
+        // echo "<script>console.log('index');</script>";
 
     }
     // Close DB connection

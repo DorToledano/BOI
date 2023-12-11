@@ -1,6 +1,6 @@
 <?php
 include_once __DIR__ . '/../config.php';
-include_once __DIR__ . '/DatabaseUtils.php';
+include_once __DIR__ . '/../services/DatabaseUtils.php';
 
 class ApiHandler {
     private const API_ENDPOINT = 'https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_%s_ILS?startperiod=2023-01-01&endperiod=2024-01-01&format=sdmx-json&data';
