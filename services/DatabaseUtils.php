@@ -5,7 +5,7 @@ class DatabaseUtils
 
     function insertExchangeRates($conn, $values, $currency)
     {
-        $tableName = "exchange_rates_" . strtolower($currency); // Generating the table name
+        $tableName = "exchange_rates_" . strtolower($currency); 
 
         $sql = "INSERT IGNORE INTO $tableName (currency, exchange_rate, Date_stamp) VALUES " . implode(",", $values);
 
