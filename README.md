@@ -1,6 +1,6 @@
 # Bank of Israel App
 
-Welcome to the Bank of Israel App repository! This application is built using PHP and MySQL for the backend, providing a platform to manage banking transactions.
+Welcome to the Bank of Israel App repository! This application is built using PHP and MySQL for the backend, providing a platform to view exhange rates to ILS.
 
 ## Setup Instructions
 
