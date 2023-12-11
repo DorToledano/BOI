@@ -42,13 +42,48 @@ class ApiHandler {
         }
     }
 
+    // private function updateDatabase($currency, $apiData) {
+    //     $conn = $this->dbUtils->connectToDatabase();
+
+    //     try {
+    //         // Inserting new exchange 
+    //         $this->dbUtils->insertExchangeRates($conn, $apiData, $currency);
+
+    //         // Removing duplicates 
+    //         $this->dbUtils->removeDuplicateRecords($conn, $currency);
+    //     } catch (Exception $e) {
+    //         // Handle exceptions (log or display an error message)
+    //         echo 'Error updating database: ' . $e->getMessage();
+    //     } finally {
+    //         // Always close db connection
+    //         $conn->close();
+    //     }
+    // }
+
     private function updateDatabase($currency, $apiData) {
         $conn = $this->dbUtils->connectToDatabase();
-
+    
         try {
-            // Inserting new exchange 
-            $this->dbUtils->insertExchangeRates($conn, $apiData, $currency);
-
+            // Get existing data from the database
+            $existingData = $this->dbUtils->getDataFromDB($conn, "exchange_rates_" . strtolower($currency));
+    
+            // Check if the database is empty or has fewer records than the API data
+            if (empty($existingData) || count($existingData) < count($apiData)) {
+                // If empty or fewer records, insert all API data
+                $this->dbUtils->insertExchangeRates($conn, $apiData, $currency);
+            } else {
+                // Update existing records with the corresponding API data
+                foreach ($existingData as $existingRecord) {
+                    foreach ($apiData as $apiRecord) {
+                        if ($existingRecord['Date_stamp'] === $apiRecord['Date_stamp']) {
+                            // Update existing record with new data
+                            $this->dbUtils->updateExchangeRate($conn, $apiRecord, $currency);
+                            break;
+                        }
+                    }
+                }
+            }
+    
             // Removing duplicates 
             $this->dbUtils->removeDuplicateRecords($conn, $currency);
         } catch (Exception $e) {
@@ -59,6 +94,7 @@ class ApiHandler {
             $conn->close();
         }
     }
+    
 
     private function makeApiRequest($apiEndpoint) {
         // Initialize cURL session
