@@ -1,0 +1,83 @@
+.homepage {
+  background-image: url("../../assets/bcg.jpeg"); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff; 
+  display: flex;
+  flex-direction: column;
+  h2 {
+    background-color: rgba(0, 0, 0, 0.5); 
+    padding: 15px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #fff; 
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  label{
+    padding: 15px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #fff; 
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  
+  }
+
+  select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: #4CAF50; /* Add a border color when the dropdown is focused */
+    }
+}
+}
+
+.container {
+  padding: 0;
+}
+
+// ExchangeRateTable.scss
+
+.exchange-rate-table-container {
+  color: black;
+  background-color: rgba(255, 255, 255, 0.8); 
+  border-radius: 4%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+  
+}
+
+.exchange-rate-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10%; 
+  margin-block: auto;
+}
+
+.exchange-rate-table th,
+.exchange-rate-table td {
+  padding: 10px;
+  // border: 1px solid #ddd;
+  text-align: left;
+}
+
+.exchange-rate-table th {
+  background-color: #f2f2f2; /* Gray background for table header */
+}
+
+.exchange-rate-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9; /* Alternating row background color */
+}
