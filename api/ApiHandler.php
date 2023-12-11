@@ -69,23 +69,9 @@ class ApiHandler {
     
             // Check if the database is empty or has fewer records than the API data
             if (empty($existingData) || count($existingData) < count($apiData)) {
-                // If empty or fewer records, insert all API data
-                $this->dbUtils->insertExchangeRates($conn, $apiData, $currency);
-            } else {
-                // Update existing records with the corresponding API data
-                foreach ($existingData as $existingRecord) {
-                    foreach ($apiData as $apiRecord) {
-                        if ($existingRecord['Date_stamp'] === $apiRecord['Date_stamp']) {
-                            // Update existing record with new data
-                            $this->dbUtils->updateExchangeRate($conn, $apiRecord, $currency);
-                            break;
-                        }
-                    }
-                }
+                // If empty or fewer records, insert all API data or update it
+                $this->dbUtils->insertOrUpdateExchangeRates($conn, $apiData, $currency);
             }
-    
-            // Removing duplicates 
-            $this->dbUtils->removeDuplicateRecords($conn, $currency);
         } catch (Exception $e) {
             // Handle exceptions (log or display an error message)
             echo 'Error updating database: ' . $e->getMessage();
@@ -94,6 +80,8 @@ class ApiHandler {
             $conn->close();
         }
     }
+    
+    
     
 
     private function makeApiRequest($apiEndpoint) {

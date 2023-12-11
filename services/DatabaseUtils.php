@@ -58,5 +58,46 @@ class DatabaseUtils
         return $results;
     }
 
+    function insertOrUpdateExchangeRates($conn, $values, $currency)
+{
+    $tableName = "exchange_rates_" . strtolower($currency);
+
+    foreach ($values as $value) {
+        $date = $value['Date_stamp'];
+
+        // Check if the record already exists
+        $existingRecord = $this->getExchangeRateByDate($conn, $tableName, $date);
+
+        if (!$existingRecord) {
+            // Insert new record
+            $this->insertExchangeRates($conn, [$value], $currency);
+        }
+    }
+}
+
+
+    function updateExchangeRate($conn, $tableName, $data, $date)
+    {
+        $sql = "UPDATE $tableName SET
+                currency = '{$data['currency']}',
+                exchange_rate = {$data['exchange_rate']}
+                WHERE Date_stamp = '$date'";
+
+        if ($conn->query($sql) !== TRUE) {
+            die("Error updating record: " . $conn->error);
+        }
+    }
+
+    function getExchangeRateByDate($conn, $tableName, $date)
+    {
+        $sql = "SELECT * FROM $tableName WHERE Date_stamp = '$date'";
+        $result = $conn->query($sql);
+
+        if (!$result) {
+            die("Error: " . $conn->error);
+        }
+
+        return $result->fetch_assoc();
+    }
 }
 ?>
