@@ -21,12 +21,12 @@ $dbUtils = new DatabaseUtils();
 // Create an instance of the ApiHandler class, passing the DatabaseUtils instance
 $apiHandler = new ApiHandler($dbUtils);
 
-// Specify the currencies for which you want to ensure the database and tables exist
 $currencies = ['USD', 'EUR', 'GBP'];
 
-// Loop through each currency and call the ensureDatabaseAndTablesExist method
 foreach ($currencies as $currency) {
     $apiHandler->ensureDatabaseAndTablesExist($currency);
+    // Fetch data from the external API and update the database
+    $apiHandler->fetchDataAndUpdateDatabase($currency);
 }
 
 ?>
