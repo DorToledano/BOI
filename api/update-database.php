@@ -1,4 +1,5 @@
 <?php
+
 // Enable CORS
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
@@ -12,6 +13,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include_once __DIR__ . '/../services/DatabaseUtils.php';
+include_once __DIR__ . '/../api/ApiHandler.php';  
 
 $conn = DatabaseUtils::connectToDatabase();
 
@@ -27,15 +29,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     header('Content-Type: application/json');
     echo json_encode($results, JSON_PRETTY_PRINT);
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $data = json_decode(file_get_contents('php://input'), true);
 
     if ($data && isset($data['currency'])) {
         $currency = $data['currency'];
-        $apiData = ApiHandler::makeApiRequest(sprintf(ApiHandler::API_ENDPOINT, $currency));
 
-        // Update db with new data
-        ApiHandler::updateDatabase($currency, $apiData);
+        // Instantiate DatabaseUtils
+        $dbUtils = new DatabaseUtils();
+
+        // Instantiate ApiHandler with DatabaseUtils instance
+        $apiHandler = new ApiHandler($dbUtils);
+
+        // Assume you have a method to get $apiData from the API
+        $apiData = $apiHandler->fetchDataAndUpdateDatabase($currency);
+
+        // Call the updateDatabase method on the instance
+        $apiHandler->updateDatabase($currency, $apiData);
 
         echo json_encode(['status' => 'success', 'message' => 'Database updated successfully']);
     } else {

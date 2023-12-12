@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
-import fetchData from '../services/data.service'
+import fetchData from '../services/data.service';
 
 const StatisticsPage = () => {
   const [currency, setCurrency] = useState('USD');
@@ -13,30 +12,42 @@ const StatisticsPage = () => {
     getData();
   }, [currency]);
 
-  const getData=async ()=>{
-    const data= await fetchData(`http://localhost/bank-proj/api/rate/RateService.php?currency=${currency}`)
-    const rates = data.map(entry => parseFloat(entry.exchange_rate));
-    const dates = data.map(entry => entry.Date_stamp);
-    setExchangeRates(rates);
-    setDateStamps(dates);
+  const getData = async () => {
+    try {
+      const data = await fetchData(
+        `http://localhost/bank-proj/api/rate/RateService.php?currency=${currency}`
+      );
+
+      // Check if data is an array before mapping
+      if (Array.isArray(data)) {
+        const rates = data.map(entry => parseFloat(entry.exchange_rate));
+        const dates = data.map(entry => entry.Date_stamp);
+        setExchangeRates(rates);
+        setDateStamps(dates);
+      } else {
+        console.error('Invalid data format:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  if (!Array.isArray(exchangeRates) || !Array.isArray(dateStamps)) {
+    return <div>Loading...</div>;
   }
 
-
-  if (!Array.isArray(exchangeRates) || !Array.isArray(dateStamps)) return null;
-
   const chartData = {
-    labels: dateStamps.slice().reverse(),  
+    labels: dateStamps.slice().reverse(),
     datasets: [
       {
         label: currency,
-        data: exchangeRates.slice().reverse(),  
+        data: exchangeRates.slice().reverse(),
         borderColor: 'blue',
         fill: false,
       },
     ],
   };
 
-  
   const currencyOptions = ['USD', 'EUR', 'GBP'];
 
   return (

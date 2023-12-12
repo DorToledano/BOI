@@ -13,13 +13,30 @@ class ApiHandler
         $this->dbUtils = $dbUtils;
     }
 
+    // public function fetchDataAndUpdateDatabase($currency)
+    // {
+    //     $apiEndpoint = sprintf(self::API_ENDPOINT, $currency);
+    //     $apiData = $this->makeApiRequest($apiEndpoint);
+
+    //     // Update db with new data
+    //     $this->updateDatabase($currency, $apiData);
+
+    //     return $apiData;
+    // }
+
     public function fetchDataAndUpdateDatabase($currency)
     {
+        // Create an instance of DatabaseUtils
+        $dbUtils = new DatabaseUtils();
+
+        // Create an instance of ApiHandler and provide DatabaseUtils instance
+        $apiHandler = new ApiHandler($dbUtils);
+
         $apiEndpoint = sprintf(self::API_ENDPOINT, $currency);
-        $apiData = $this->makeApiRequest($apiEndpoint);
+        $apiData = $apiHandler->makeApiRequest($apiEndpoint);
 
         // Update db with new data
-        $this->updateDatabase($currency, $apiData);
+        $apiHandler->updateDatabase($currency, $apiData);
 
         return $apiData;
     }
@@ -46,30 +63,12 @@ class ApiHandler
         }
     }
 
-    // private function updateDatabase($currency, $apiData) {
-    //     $conn = $this->dbUtils->connectToDatabase();
-
-    //     try {
-    //         // Inserting new exchange 
-    //         $this->dbUtils->insertExchangeRates($conn, $apiData, $currency);
-
-    //         // Removing duplicates 
-    //         $this->dbUtils->removeDuplicateRecords($conn, $currency);
-    //     } catch (Exception $e) {
-    //         // Handle exceptions (log or display an error message)
-    //         echo 'Error updating database: ' . $e->getMessage();
-    //     } finally {
-    //         // Always close db connection
-    //         $conn->close();
-    //     }
-    // }
-
     private function updateDatabase($currency, $apiData)
     {
         $conn = $this->dbUtils->connectToDatabase();
 
         try {
-            // Get existing data from the database
+            // Get data from db
             $existingData = $this->dbUtils->getDataFromDB($conn, "exchange_rates_" . strtoupper($currency));
 
             $values = $this->formatData($apiData);
@@ -78,17 +77,13 @@ class ApiHandler
     
             // Check if the database is empty or has fewer records than the API data
             if (empty($existingData)) {
-                // If empty data insert it 
                 $this->dbUtils->insertExchangeRates($conn, $values, $currency);
             } elseif (count($existingData) < count($dates)) {
-                // If there is new data update it 
                 $this->dbUtils->insertOrUpdateExchangeRates($conn, $rates,$dates, $currency);
             }            
         } catch (Exception $e) {
-            // Handle exceptions (log or display an error message)
             echo 'Error updating database: ' . $e->getMessage();
         } finally {
-            // Always close db connection
             $conn->close();
         }
     }
@@ -110,10 +105,7 @@ class ApiHandler
 
     }
 
-
-
-
-    private function makeApiRequest($apiEndpoint)
+    public function makeApiRequest($apiEndpoint)
     {
         // Initialize cURL session
         $ch = curl_init($apiEndpoint);

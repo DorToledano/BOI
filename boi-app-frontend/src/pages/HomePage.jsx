@@ -1,50 +1,47 @@
-import React, { useState, useEffect } from 'react'
-import CurrencyDropdown from '../cmps/CurrencyDropdown'
-import ExchangeRateTable from '../cmps/ExchangeRateTable'
-import fetchData from '../services/data.service'
+import React, { useState, useEffect } from 'react';
+import CurrencyDropdown from '../cmps/CurrencyDropdown';
+import ExchangeRateTable from '../cmps/ExchangeRateTable';
+import fetchData from '../services/data.service';
 
-const API_ENDPOINT = 'http://localhost/bank-proj/api/rate/RateService.php'
+const API_ENDPOINT = 'http://localhost/bank-proj/api/rate/RateService.php';
 
 const HomePage = () => {
-  const [exchangeRate, setExchangeRate] = useState(null)
-  const [currency, setCurrency] = useState('USD')
-  const [limit, setLimit] = useState(7)
+  const [exchangeRate, setExchangeRate] = useState(null);
+  const [currency, setCurrency] = useState('USD');
+  const [limit, setLimit] = useState(7);
 
   useEffect(() => {
-    fetchDataAndHandleError()
-    updateDatabase()
-  }, [currency, limit])
+    fetchDataAndHandleError();
+  }, [currency, limit]);
 
   const fetchDataAndHandleError = async () => {
     try {
-      const data = await fetchData(
-        `${API_ENDPOINT}?currency=${currency}&limit=${limit}`
-      )
-      setExchangeRate(data)
+      const data = await fetchData(`${API_ENDPOINT}?currency=${currency}&limit=${limit}`);
+      await updateDatabase();
+      setExchangeRate(data);
     } catch (error) {
-      console.error('Error fetching Data from database:', error.message)
+      console.error('Error:', error.message);
     }
-  }
+  };
 
   const updateDatabase = async () => {
     try {
-      // update the database
-      const updateResponse = await fetchData(
-        'http://localhost/bank-proj/api/update-database.php',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ currency, limit }),
-        }
-      )
+      const updateResponse = await fetchData('http://localhost/bank-proj/api/update-database.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ currency, limit }),
+      });
+      console.log('Database update response:', updateResponse);
     } catch (error) {
-      console.error('Error updating database:', error.message)
+      console.error('Error updating database:', error.message);
     }
-  }
+  };
 
-  if (!Array.isArray(exchangeRate)) return null
+  if (!exchangeRate) return <div>Loading...</div>;
+
+  if (!Array.isArray(exchangeRate)) return null;
 
   return (
     <div className="homepage">
@@ -56,7 +53,7 @@ const HomePage = () => {
       />
       <ExchangeRateTable exchangeRate={exchangeRate} />
     </div>
-  )
-}
+  );
+};
 
-export default HomePage
+export default HomePage;
