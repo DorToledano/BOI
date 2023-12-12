@@ -6,7 +6,7 @@ const fetchData = async (url) => {
     return response.data;
   } catch (error) {
     console.error('Error fetching data:', error.message);
-    throw error; // Re-throw the error to handle it elsewhere if needed
+    throw error; 
   }
 };
 

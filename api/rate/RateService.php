@@ -1,7 +1,7 @@
 <?php
 
-header('Access-Control-Allow-Origin: *');  // Allow requests from any origin
-header('Access-Control-Allow-Methods: GET');  // Allow only GET requests
+header('Access-Control-Allow-Origin: *');  
+header('Access-Control-Allow-Methods: GET');  
 header('Access-Control-Allow-Headers: Content-Type');
 
 // Preflight OPTIONS Requests

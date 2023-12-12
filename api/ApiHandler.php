@@ -26,10 +26,10 @@ class ApiHandler
 
     public function fetchDataAndUpdateDatabase($currency)
     {
-        // Create an instance of DatabaseUtils
+        //instance of DatabaseUtils
         $dbUtils = new DatabaseUtils();
 
-        // Create an instance of ApiHandler and provide DatabaseUtils instance
+        //instance of ApiHandler
         $apiHandler = new ApiHandler($dbUtils);
 
         $apiEndpoint = sprintf(self::API_ENDPOINT, $currency);
@@ -46,19 +46,12 @@ class ApiHandler
         $conn = $this->dbUtils->connectToDatabase();
 
         try {
-            // Create the database if it doesn't exist
             $this->createDatabaseIfNotExists($conn);
-
-            // Switch to the specified database
             $conn->select_db(DB_NAME);
-
-            // Create exchange rates tables if they don't exist
             $this->createExchangeRatesTablesIfNotExists($conn, $currency);
         } catch (Exception $e) {
-            // Handle exceptions (log or display an error message)
             echo 'Error: ' . $e->getMessage();
         } finally {
-            // Always close db connection
             $conn->close();
         }
     }
