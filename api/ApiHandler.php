@@ -2,16 +2,19 @@
 include_once __DIR__ . '/../config.php';
 include_once __DIR__ . '/../services/DatabaseUtils.php';
 
-class ApiHandler {
+class ApiHandler
+{
     private const API_ENDPOINT = 'https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_%s_ILS?startperiod=2023-01-01&endperiod=2024-01-01&format=sdmx-json&data';
 
     private $dbUtils; // Define the dbUtils property
 
-    public function __construct(DatabaseUtils $dbUtils) {
+    public function __construct(DatabaseUtils $dbUtils)
+    {
         $this->dbUtils = $dbUtils;
     }
 
-    public function fetchDataAndUpdateDatabase($currency) {
+    public function fetchDataAndUpdateDatabase($currency)
+    {
         $apiEndpoint = sprintf(self::API_ENDPOINT, $currency);
         $apiData = $this->makeApiRequest($apiEndpoint);
 
@@ -21,7 +24,8 @@ class ApiHandler {
         return $apiData;
     }
 
-    public function ensureDatabaseAndTablesExist($currency) {
+    public function ensureDatabaseAndTablesExist($currency)
+    {
         $conn = $this->dbUtils->connectToDatabase();
 
         try {
@@ -60,20 +64,26 @@ class ApiHandler {
     //     }
     // }
 
-    private function updateDatabase($currency, $apiData) {
+    private function updateDatabase($currency, $apiData)
+    {
         $conn = $this->dbUtils->connectToDatabase();
-    
+
         try {
             // Get existing data from the database
             $existingData = $this->dbUtils->getDataFromDB($conn, "exchange_rates_" . strtolower($currency));
-    
+
+            $result = $this->formatData($apiData);
+            $rates = $result['rates'];
+            $dates = $result['dates'];
+
             // Check if the database is empty or has fewer records than the API data
-            if (empty($existingData) || count($existingData) < count($apiData)) {
-                // If empty or fewer records, insert all API data or update it
-                // $this->dbUtils->insertOrUpdateExchangeRates($conn, $apiData, $currency);
-                $this->dbUtils->insertExchangeRates($conn, $apiData, $currency);
-                $this->dbUtils->removeDuplicateRecords($conn,$currency);
-            }
+            if (empty($existingData)) {
+                // If empty data insert it 
+                $this->dbUtils->insertExchangeRates($conn, $rates, $dates, $currency);
+            } elseif (count($existingData) < count($dates)) {
+                // If there is new data update it 
+                $this->dbUtils->insertOrUpdateExchangeRates($conn, $rates, $dates, $currency);
+            }            
         } catch (Exception $e) {
             // Handle exceptions (log or display an error message)
             echo 'Error updating database: ' . $e->getMessage();
@@ -82,11 +92,30 @@ class ApiHandler {
             $conn->close();
         }
     }
-    
-    
-    
 
-    private function makeApiRequest($apiEndpoint) {
+    private function formatData($apiData)
+    {
+
+        $rawRatesData = $apiData["data"]["dataSets"][0]["series"]["0:0:0:0:0:0"]["observations"];
+        $rawDatesData = $apiData["data"]["structure"]["dimensions"]["observation"][0]["values"];
+        $rates = [];
+        $dates = [];
+        foreach ($rawRatesData as $rawRate) {
+            $rates[] = $rawRate[0];
+        }
+        foreach ($rawDatesData as $rawDate) {
+            $dates[] = $rawDate["id"];
+        }
+
+        return ['rates' => $rates, 'dates' => $dates];
+
+    }
+
+
+
+
+    private function makeApiRequest($apiEndpoint)
+    {
         // Initialize cURL session
         $ch = curl_init($apiEndpoint);
 
@@ -109,7 +138,8 @@ class ApiHandler {
         return json_decode($jsonData, true);
     }
 
-    private function createDatabaseIfNotExists($conn) {
+    private function createDatabaseIfNotExists($conn)
+    {
         $dbName = DB_NAME;
 
         $createDbSql = "CREATE DATABASE IF NOT EXISTS $dbName";
@@ -119,7 +149,8 @@ class ApiHandler {
         }
     }
 
-    private function createExchangeRatesTablesIfNotExists($conn, $currency) {
+    private function createExchangeRatesTablesIfNotExists($conn, $currency)
+    {
         $tableName = "exchange_rates_" . strtolower($currency);
 
         $createTableSql = "CREATE TABLE IF NOT EXISTS $tableName (
