@@ -6,7 +6,7 @@ class ApiHandler
 {
     private const API_ENDPOINT = 'https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_%s_ILS?startperiod=2023-01-01&endperiod=2024-01-01&format=sdmx-json&data';
 
-    private $dbUtils; // Define the dbUtils property
+    private $dbUtils; 
 
     public function __construct(DatabaseUtils $dbUtils)
     {
@@ -72,17 +72,17 @@ class ApiHandler
             // Get existing data from the database
             $existingData = $this->dbUtils->getDataFromDB($conn, "exchange_rates_" . strtolower($currency));
 
-            $result = $this->formatData($apiData);
-            $rates = $result['rates'];
-            $dates = $result['dates'];
-
+            $values = $this->formatData($apiData);
+            $rates = $values['rates'];
+            $dates = $values['dates'];
+    
             // Check if the database is empty or has fewer records than the API data
             if (empty($existingData)) {
                 // If empty data insert it 
-                $this->dbUtils->insertExchangeRates($conn, $rates, $dates, $currency);
+                $this->dbUtils->insertExchangeRates($conn, $values, $currency);
             } elseif (count($existingData) < count($dates)) {
                 // If there is new data update it 
-                $this->dbUtils->insertOrUpdateExchangeRates($conn, $rates, $dates, $currency);
+                $this->dbUtils->insertOrUpdateExchangeRates($conn, $rates,$dates, $currency);
             }            
         } catch (Exception $e) {
             // Handle exceptions (log or display an error message)

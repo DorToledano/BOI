@@ -105,6 +105,7 @@ class DatabaseUtils
             $existingRecord = $this->getExchangeRateByDate($conn, $tableName, $date);
 
             if (!$existingRecord) {
+                
                 // Insert new record
                 $this->insertExchangeRates($conn, [$value], $currency);
             }
