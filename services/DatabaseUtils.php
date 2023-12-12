@@ -18,13 +18,24 @@ class DatabaseUtils
         }
 
         // Format each value as ('USD', 3.532, '2023-01-03')
+        // Assuming $values is an associative array with keys "rates" and "dates"
+        // Assuming $values is an associative array with keys "rates" and "dates"
+        $rates = $values["rates"];
+        $dates = $values["dates"];
+
+        // Combine rates and dates into an array of arrays
+        $combinedValues = array_map(function ($rate, $date) {
+            return ['USD', $rate, $date]; // Assuming the third column is empty
+        }, $rates, $dates);
+
+        // Ensure each value is formatted correctly
         $formattedValues = array_map(function ($value) {
             // Ensure $value is an array with exactly 3 elements
             if (!is_array($value) || count($value) !== 3) {
                 die("Error: Invalid value format");
             }
             return "('" . implode("', '", $value) . "')";
-        }, $values);
+        }, $combinedValues);
 
         // Join the formatted values with commas
         $valuesString = implode(", ", $formattedValues);
@@ -34,6 +45,7 @@ class DatabaseUtils
         if ($conn->query($sql) !== TRUE) {
             die("Error: " . $conn->error);
         }
+
     }
 
 
@@ -42,7 +54,7 @@ class DatabaseUtils
 
     function removeDuplicateRecords($conn, $currency)
     {
-        $tableName = "exchange_rates_" . strtolower($currency);
+        $tableName = "exchange_rates_" . strtoupper($currency);
 
         $sql = "DELETE e1 FROM $tableName e1
             JOIN $tableName e2 
@@ -57,10 +69,32 @@ class DatabaseUtils
 
     public static function connectToDatabase()
     {
-        $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD);
+
+
+        // Check connection
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
+
+        // Create the database if it does not exist
+        $dbName = DB_NAME;
+        $createDbSql = "CREATE DATABASE IF NOT EXISTS $dbName";
+
+        if ($conn->query($createDbSql) !== TRUE) {
+            die("Error creating database: " . $conn->error);
+        }
+
+        // Close the connection without the database name
+        $conn->close();
+
+        // Reconnect with the database name included
+        $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
         return $conn;
     }
 
@@ -86,7 +120,7 @@ class DatabaseUtils
 
     function insertOrUpdateExchangeRates($conn, $rates, $dates, $currency)
     {
-        $tableName = "exchange_rates_" . strtolower($currency);
+        $tableName = "exchange_rates_" . strtoupper($currency);
         $values = array();
 
         foreach ($rates as $key => $rate) {
@@ -105,7 +139,7 @@ class DatabaseUtils
             $existingRecord = $this->getExchangeRateByDate($conn, $tableName, $date);
 
             if (!$existingRecord) {
-                
+
                 // Insert new record
                 $this->insertExchangeRates($conn, [$value], $currency);
             }

@@ -70,7 +70,7 @@ class ApiHandler
 
         try {
             // Get existing data from the database
-            $existingData = $this->dbUtils->getDataFromDB($conn, "exchange_rates_" . strtolower($currency));
+            $existingData = $this->dbUtils->getDataFromDB($conn, "exchange_rates_" . strtoupper($currency));
 
             $values = $this->formatData($apiData);
             $rates = $values['rates'];
@@ -95,7 +95,6 @@ class ApiHandler
 
     private function formatData($apiData)
     {
-
         $rawRatesData = $apiData["data"]["dataSets"][0]["series"]["0:0:0:0:0:0"]["observations"];
         $rawDatesData = $apiData["data"]["structure"]["dimensions"]["observation"][0]["values"];
         $rates = [];
@@ -151,7 +150,7 @@ class ApiHandler
 
     private function createExchangeRatesTablesIfNotExists($conn, $currency)
     {
-        $tableName = "exchange_rates_" . strtolower($currency);
+        $tableName = "exchange_rates_" . strtoupper($currency);
 
         $createTableSql = "CREATE TABLE IF NOT EXISTS $tableName (
             id INT AUTO_INCREMENT PRIMARY KEY,
