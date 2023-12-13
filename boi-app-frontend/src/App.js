@@ -7,7 +7,7 @@ import NavBar from './cmps/NavBar';
 
 function App() {
 
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     initialData()
@@ -15,11 +15,11 @@ function App() {
 
   const initialData = () => {
     fetch('http://localhost/bank-proj/index.php')
-      .then(res => setIsLoading(true))
+      .then(res => setIsLoading(false))
       .catch(err => console.error('fetch error here', err))
   }
 
-  if (!isLoading) return (
+  if (isLoading) return (
     <div>
       Loading...
     </div>

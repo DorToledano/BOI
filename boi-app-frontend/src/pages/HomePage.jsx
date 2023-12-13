@@ -33,7 +33,7 @@ const HomePage = () => {
         },
         body: JSON.stringify({ currency, limit }),
       });
-      console.log('Database update response:', updateResponse);
+      // console.log('Database update response:', updateResponse);
     } catch (error) {
       console.error('Error updating database:', error.message);
     }

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import fetchData from '../services/data.service';
+import CurrencyDropdown from '../cmps/CurrencyDropdown';
+
 
 const StatisticsPage = () => {
   const [currency, setCurrency] = useState('USD');
@@ -53,21 +55,11 @@ const StatisticsPage = () => {
   return (
     <div className="chart-container">
       <h1>2023-2024 exchange rates to ILS</h1>
-      <div className="currency-selector">
-        <label htmlFor="currency">Select Currency:</label>
-        <select
-          name="currency"
-          id="currency"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-        >
-          {currencyOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
+      <CurrencyDropdown
+        value={currency}
+        onChange={(e) => setCurrency(e.target.value)}
+        options={currencyOptions}
+      />
       <div className="chart-wrapper">
         {exchangeRates.length > 0 ? (
           <Line data={chartData} />
