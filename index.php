@@ -57,8 +57,6 @@ foreach ($currencies as $currency) {
         }
         echo "</ol>";
 
-        // echo "<script>console.log('index');</script>";
-
     }
     // Close DB connection
     $conn->close();

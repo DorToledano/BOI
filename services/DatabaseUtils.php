@@ -19,13 +19,12 @@ class DatabaseUtils
 
         // Format each value as ('USD', 3.532, '2023-01-03')
         // Assuming $values is an associative array with keys "rates" and "dates"
-        // Assuming $values is an associative array with keys "rates" and "dates"
         $rates = $values["rates"];
         $dates = $values["dates"];
 
         // Combine rates and dates into an array of arrays
-        $combinedValues = array_map(function ($rate, $date) {
-            return ['USD', $rate, $date]; // Assuming the third column is empty
+        $combinedValues = array_map(function ($rate, $date) use ($currency) {
+            return [$currency, $rate, $date]; // Use $currency variable here
         }, $rates, $dates);
 
         // Ensure each value is formatted correctly
